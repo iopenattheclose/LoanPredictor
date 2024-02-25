@@ -3,25 +3,23 @@ import sys
 from src.exception import CustomException
 from src.logger import logging
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
 
 from dataclasses import dataclass
 
 @dataclass
-class DataPreProcessingConfig:
-    #declaring three path variables which are created in artifacts folder
+class DataPreProcessingFEConfig:
     train_data_path: str=os.path.join('artifacts',"train.csv")
     test_data_path: str=os.path.join('artifacts',"test.csv")
 
-class DataPreProcessing:
+class DataPreProcessingFE:
     def __init__(self):
-        # ingestion_config variable will consist of the three values defined in DataIngestionConfig class
-        self.preprocessing_config=DataPreProcessingConfig()
+        self.preprocessing_config=DataPreProcessingFEConfig()
 
     def initiate_data_preprocessing(self):
             logging.info("Entered the data preprocessing method or component")
             try:
-                #instead of csv file, this data can be fetched from any data source (viz mongodb)
                 data=pd.read_csv('artifacts/data.csv')
                 logging.info('Read the raw dataset needed for pre processing')
                 
@@ -30,30 +28,58 @@ class DataPreProcessing:
                 data.loc[(data.home_ownership == 'ANY') | (data.home_ownership == 'NONE'), 'home_ownership'] = 'OTHER'
                 data['issue_d'] = pd.to_datetime(data['issue_d'])
                 data['earliest_cr_line'] = pd.to_datetime(data['earliest_cr_line'])
-                print(data.head())
-
-                print(data["loan_status"].head())
+                data['title'] = data.title.str.lower()
 
                 data['pub_rec'] = data['pub_rec'].apply(self.encode)
                 data['mort_acc'] = data['mort_acc'].apply(self.encode)
                 data['pub_rec_bankruptcies'] = data['pub_rec_bankruptcies'].apply(self.encode)
                 data['loan_status'] = data['loan_status'].apply(self.encode)
 
+
+                # Saving mean of mort_acc according to total_acc_avg 
+                self.total_acc_avg = data.groupby(by='total_acc').mean(numeric_only=True).mort_acc
+                data['mort_acc'] = data.apply(lambda x: self.fill_mort_acc(x['total_acc'], x['mort_acc']), axis=1)
+                data.dropna(inplace=True)
+
+                numerical_data = data.select_dtypes(include='number')
+                num_cols = numerical_data.columns
+
+                for col in num_cols:
+                    mean = data[col].mean()
+                    std = data[col].std()
+
+                    upper_limit = mean+3*std
+                    lower_limit = mean-3*std
+
+                    data = data[(data[col]<upper_limit) & (data[col]>lower_limit)]
+
+                term_values = {' 36 months': 36, ' 60 months': 60}
+                data['term'] = data.term.map(term_values)
+                list_status = {'w': 0, 'f': 1}
+                data['initial_list_status'] = data.initial_list_status.map(list_status)
+
+                data.drop(columns=['issue_d', 'emp_title', 'title', 'sub_grade',
+                   'address', 'earliest_cr_line', 'emp_length'],
+                   axis=1, inplace=True)
+
                 print(data.head())
-                print(data["loan_status"].head())
 
-                # logging.info("Train test split initiated")
-                # train_set,test_set=train_test_split(df,test_size=0.2,random_state=42)
+                logging.info("Train test split initiated")
 
-                # train_set.to_csv(self.ingestion_config.train_data_path,index=False,header=True)
+                train_set,test_set=train_test_split(data,test_size=0.2,random_state=42)
 
-                # test_set.to_csv(self.ingestion_config.test_data_path,index=False,header=True)
+                train_set.to_csv(self.preprocessing_config.train_data_path,index=False,header=True)
 
-                # return(
-                #      #returning path of train and test because this will be used in data transformationl
-                #     self.ingestion_config.train_data_path,
-                #     self.ingestion_config.test_data_path
-                # )
+                test_set.to_csv(self.preprocessing_config.test_data_path,index=False,header=True)
+
+                logging.info("Data split is completed")
+
+                return(
+                    data,
+                    self.preprocessing_config.train_data_path,
+                    self.preprocessing_config.test_data_path
+                )
+            
             except Exception as e:
                 raise CustomException(e,sys)
 
@@ -63,6 +89,13 @@ class DataPreProcessing:
         else:
             return 1
         
+    def fill_mort_acc(self,total_acc, mort_acc):
+        if np.isnan(mort_acc):
+            return self.total_acc_avg[total_acc].round()
+        else:
+            return mort_acc
+
+
 if __name__=="__main__":
-    obj=DataPreProcessing()
+    obj=DataPreProcessingFE()
     obj.initiate_data_preprocessing()
