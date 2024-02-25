@@ -62,8 +62,6 @@ class DataPreProcessingFE:
                    'address', 'earliest_cr_line', 'emp_length'],
                    axis=1, inplace=True)
 
-                print(data.head())
-
                 logging.info("Train test split initiated")
 
                 train_set,test_set=train_test_split(data,test_size=0.2,random_state=42)
@@ -94,8 +92,3 @@ class DataPreProcessingFE:
             return self.total_acc_avg[total_acc].round()
         else:
             return mort_acc
-
-
-if __name__=="__main__":
-    obj=DataPreProcessingFE()
-    obj.initiate_data_preprocessing()
