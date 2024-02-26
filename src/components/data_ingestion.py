@@ -3,6 +3,7 @@ import sys
 from src.exception import CustomException
 from src.logger import logging
 import pandas as pd
+from src.pipeline.predict_pipeline import PredictPipeline
 
 from dataclasses import dataclass
 
@@ -11,6 +12,9 @@ from src.components.data_PPFE import DataPreProcessingFEConfig
 
 from src.components.data_transformation import DataTransformation
 from src.components.data_transformation import DataTransformationConfig
+
+from src.components.model_trainer import ModelTrainer
+from src.components.model_trainer import ModelTrainerConfig
 
 @dataclass
 class DataIngestionConfig:
@@ -48,7 +52,33 @@ if __name__=="__main__":
 
     data_transformation = DataTransformation()
     train_arr,test_arr,_=data_transformation.initiate_data_transformation(preprocessed_df,train_data_path,test_data_path)
-    # train_arr,test_arr,_=data_transformation.initiate_data_transformation(train_data,test_data)
 
-    # modeltrainer=ModelTrainer()
-    # print(modeltrainer.initiate_model_trainer(train_arr,test_arr))
+    modeltrainer=ModelTrainer()
+    print('Accuracy of Logistic Regression Classifier on test data set: {:.5f}'.format(modeltrainer.initiate_model_trainer(train_arr,test_arr)))
+
+    df = pd.DataFrame({
+         'loan_amnt':1500000000,
+         'term':36,
+         'int_rate':11.2,
+         'grade':'A',
+         'home_ownership':'OWN',
+         'annual_inc':145000,
+         'verification_status':'Verified',
+         'purpose':'small_business',
+         'dti':12.12,
+         'open_acc':8,
+         'pub_rec':0,
+         'revol_bal':1,
+         'revol_util':3.2,
+         'total_acc':9,
+         'initial_list_status':1,
+         'application_type':'INDIVIDUAL',
+         'mort_acc':0,
+         'pub_rec_bankruptcies':0
+    },index=[0])
+
+    print(df)
+
+    predict_pipeline=PredictPipeline()
+    results=predict_pipeline.predict(df)
+    print(results[0])
