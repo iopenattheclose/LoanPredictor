@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Application Form</title>
+</head>
+<body>
+    <h1>Loan Application Form</h1>
+    <form action="{{ url_for('predict_datapoint')}}" method="post">
+        <div>
+            <label for="loan_amnt">Loan Amount:</label>
+            <input type="text" id="loan_amnt" name="loan_amnt" required>
+        </div>
+        <div>
+            <label for="term">Term:</label>
+            <input type="text" id="term" name="term" required>
+        </div>
+        <div>
+            <label for="int_rate">Interest Rate:</label>
+            <input type="text" id="int_rate" name="int_rate" required>
+        </div>
+        <div>
+            <label for="grade">Grade:</label>
+            <input type="text" id="grade" name="grade" required>
+        </div>
+        <div>
+            <label for="home_ownership">Home Ownership:</label>
+            <input type="text" id="home_ownership" name="home_ownership" required>
+        </div>
+        <div>
+            <label for="annual_inc">Annual Income:</label>
+            <input type="text" id="annual_inc" name="annual_inc" required>
+        </div>
+        <div>
+            <label for="verification_status">Verification Status:</label>
+            <input type="text" id="verification_status" name="verification_status" required>
+        </div>
+        <div>
+            <label for="purpose">Purpose:</label>
+            <input type="text" id="purpose" name="purpose" required>
+        </div>
+        <div>
+            <label for="dti">Debt-to-Income Ratio:</label>
+            <input type="text" id="dti" name="dti" required>
+        </div>
+        <div>
+            <label for="open_acc">Open Accounts:</label>
+            <input type="text" id="open_acc" name="open_acc" required>
+        </div>
+        <div>
+            <label for="pub_rec">Public Records:</label>
+            <input type="text" id="pub_rec" name="pub_rec" required>
+        </div>
+        <div>
+            <label for="revol_bal">Revolving Balance:</label>
+            <input type="text" id="revol_bal" name="revol_bal" required>
+        </div>
+        <div>
+            <label for="revol_util">Revolving Utilization:</label>
+            <input type="text" id="revol_util" name="revol_util" required>
+        </div>
+        <div>
+            <label for="total_acc">Total Accounts:</label>
+            <input type="text" id="total_acc" name="total_acc" required>
+        </div>
+        <div>
+            <label for="initial_list_status">Initial List Status:</label>
+            <input type="text" id="initial_list_status" name="initial_list_status" required>
+        </div>
+        <div>
+            <label for="application_type">Application Type:</label>
+            <input type="text" id="application_type" name="application_type" required>
+        </div>
+        <div>
+            <label for="mort_acc">Mortgage Accounts:</label>
+            <input type="text" id="mort_acc" name="mort_acc" required>
+        </div>
+        <div>
+            <label for="pub_rec_bankruptcies">Public Record Bankruptcies:</label>
+            <input type="text" id="pub_rec_bankruptcies" name="pub_rec_bankruptcies" required>
+        </div>
+        <div>
+            <input type="submit" value="Submit Application">
+        </div>
+    </form>
+    <h2>
+        {{results}}
+     </h2>
+</body>
+</html>

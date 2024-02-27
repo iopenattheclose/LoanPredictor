@@ -56,29 +56,29 @@ if __name__=="__main__":
     modeltrainer=ModelTrainer()
     print('Accuracy of Logistic Regression Classifier on test data set: {:.5f}'.format(modeltrainer.initiate_model_trainer(train_arr,test_arr)))
 
-    df = pd.DataFrame({
-         'loan_amnt':1500000000,
-         'term':36,
-         'int_rate':11.2,
-         'grade':'A',
-         'home_ownership':'OWN',
-         'annual_inc':145000,
-         'verification_status':'Verified',
-         'purpose':'small_business',
-         'dti':12.12,
-         'open_acc':8,
-         'pub_rec':0,
-         'revol_bal':1,
-         'revol_util':3.2,
-         'total_acc':9,
-         'initial_list_status':1,
-         'application_type':'INDIVIDUAL',
-         'mort_acc':0,
-         'pub_rec_bankruptcies':0
-    },index=[0])
+    # df = pd.DataFrame({
+    #      'loan_amnt':1500,
+    #      'term':36,
+    #      'int_rate':11.2,
+    #      'grade':'A',
+    #      'home_ownership':'OWN',
+    #      'annual_inc':1000,
+    #      'verification_status':'Verified',
+    #      'purpose':'small_business',
+    #      'dti':12.12,
+    #      'open_acc':8,
+    #      'pub_rec':0,
+    #      'revol_bal':1,
+    #      'revol_util':3.2,
+    #      'total_acc':9,
+    #      'initial_list_status':1,
+    #      'application_type':'INDIVIDUAL',
+    #      'mort_acc':0,
+    #      'pub_rec_bankruptcies':0
+    # },index=[0])
 
-    print(df)
+    # print(df)
 
-    predict_pipeline=PredictPipeline()
-    results=predict_pipeline.predict(df)
-    print(results[0])
+    # predict_pipeline=PredictPipeline()
+    # results=predict_pipeline.predict(df)
+    # print(results[0])
