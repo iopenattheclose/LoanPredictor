@@ -4,81 +4,196 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loan Application Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <h1>Loan Application Form</h1>
     <form action="{{ url_for('predict_datapoint')}}" method="post">
         <div>
             <label for="loan_amnt">Loan Amount:</label>
-            <input type="text" id="loan_amnt" name="loan_amnt" required>
+            <input type="number" id="loan_amnt" name="loan_amnt" required>
         </div>
         <div>
             <label for="term">Term:</label>
-            <input type="text" id="term" name="term" required>
+            <select id="term" name="term" required>
+                <option value="">Select term in months</option>
+                <option value="36">36</option>
+                <option value="60">60</option>
+            </select>
         </div>
         <div>
             <label for="int_rate">Interest Rate:</label>
-            <input type="text" id="int_rate" name="int_rate" required>
+            <input type="number" id="int_rate" name="int_rate" required>
         </div>
         <div>
             <label for="grade">Grade:</label>
-            <input type="text" id="grade" name="grade" required>
+            <select id="grade" name="grade" required>
+                <option value="">Select grade</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+            </select>
         </div>
         <div>
             <label for="home_ownership">Home Ownership:</label>
-            <input type="text" id="home_ownership" name="home_ownership" required>
+            <select id="home_ownership" name="home_ownership" required>
+                <option value="">Select home ownership...</option>
+                <option value="MORTGAGE">Mortgage</option>
+                <option value="RENT">Rent</option>
+                <option value="OWN">Own</option>
+                <option value="OTHER">Other</option>
+            </select>
         </div>
         <div>
             <label for="annual_inc">Annual Income:</label>
-            <input type="text" id="annual_inc" name="annual_inc" required>
+            <input type="number" id="annual_inc" name="annual_inc" required>
         </div>
         <div>
             <label for="verification_status">Verification Status:</label>
-            <input type="text" id="verification_status" name="verification_status" required>
+            <select id="verification_status" name="verification_status" required>
+                <option value="">Select verification status...</option>
+                <option value="Not Verified">Not Verified</option>
+                <option value="Verified">Verified</option>
+                <option value="Source Verified">Source Verified</option>
+            </select>
         </div>
         <div>
             <label for="purpose">Purpose:</label>
-            <input type="text" id="purpose" name="purpose" required>
+            <select id="purpose" name="purpose" required>
+                <option value="">Select purpose...</option>
+                <option value="debt_consolidation">debt_consolidation</option>
+                <option value="moving">moving</option>
+                <option value="vacation">vacation</option>
+                <option value="credit_card">credit_card</option>
+                <option value="car">car</option>
+                <option value="other">other</option>
+                <option value="major_purchase">major_purchase</option>
+                <option value="home_improvement">home_improvement</option>
+                <option value="house">house</option>
+                <option value="wedding">wedding</option>
+                <option value="medical">medical</option>
+                <option value="small_business">small_business</option>
+                <option value="educational">educational</option>
+                <option value="renewable_energy">renewable_energy</option>
+            </select>
         </div>
         <div>
             <label for="dti">Debt-to-Income Ratio:</label>
-            <input type="text" id="dti" name="dti" required>
+            <input type="number" id="dti" name="dti" required>
         </div>
         <div>
             <label for="open_acc">Open Accounts:</label>
-            <input type="text" id="open_acc" name="open_acc" required>
+            <input type="number" id="open_acc" name="open_acc" required>
         </div>
         <div>
             <label for="pub_rec">Public Records:</label>
-            <input type="text" id="pub_rec" name="pub_rec" required>
+            <select id="pub_rec" name="pub_rec" required>
+                <option value="">Select public records...</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+            </select>
         </div>
         <div>
             <label for="revol_bal">Revolving Balance:</label>
-            <input type="text" id="revol_bal" name="revol_bal" required>
+            <input type="number" id="revol_bal" name="revol_bal" required>
         </div>
         <div>
             <label for="revol_util">Revolving Utilization:</label>
-            <input type="text" id="revol_util" name="revol_util" required>
+            <input type="number" id="revol_util" name="revol_util" required>
         </div>
         <div>
             <label for="total_acc">Total Accounts:</label>
-            <input type="text" id="total_acc" name="total_acc" required>
+            <input type="number" id="total_acc" name="total_acc" required>
         </div>
         <div>
-            <label for="initial_list_status">Initial List Status:</label>
-            <input type="text" id="initial_list_status" name="initial_list_status" required>
+            <label for="individual_status">Individual Status:</label>
+            <select id="individual_status" name="individual_status" required>
+                <option value="">Select individual status...</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+            </select>
         </div>
         <div>
             <label for="application_type">Application Type:</label>
-            <input type="text" id="application_type" name="application_type" required>
+            <select id="application_type" name="application_type" required>
+                <option value="">Select application type...</option>
+                <option value="INDIVIDUAL">INDIVIDUAL</option>
+                <option value="JOINT">JOINT</option>
+                <option value="DIRECT_PAY">DIRECT_PAY</option>
+            </select>
         </div>
         <div>
             <label for="mort_acc">Mortgage Accounts:</label>
-            <input type="text" id="mort_acc" name="mort_acc" required>
+            <select id="mort_acc" name="mort_acc" required>
+                <option value="">Select number of mortgage accounts...</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+            </select>
         </div>
         <div>
             <label for="pub_rec_bankruptcies">Public Record Bankruptcies:</label>
-            <input type="text" id="pub_rec_bankruptcies" name="pub_rec_bankruptcies" required>
+            <select id="pub_rec_bankruptcies" name="pub_rec_bankruptcies" required>
+                <option value="">Select number of public record bankruptcies...</option>
+                <option value="0">0</option>
+                <option value="1">1</option>
+            </select>
         </div>
         <div>
             <input type="submit" value="Submit Application">
