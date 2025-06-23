@@ -3,70 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loan Application Form</title>
+    <title>Loan Application Form – Interactive</title>
     <style>
+        :root {
+            --bg: #ffffff;
+            --fg: #000000;
+            --primary: #4CAF50;
+            --primary-dark: #45a049;
+            --border: #ccc;
+        }
+        [data-theme="dark"] {
+            --bg: #1e1e1e;
+            --fg: #f3f3f3;
+            --primary: #2196F3;
+            --primary-dark: #1e88e5;
+            --border: #555;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            background-color: var(--bg);
+            color: var(--fg);
         }
-
+        header {
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--primary);
+            color: #fff;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+        #themeToggle {
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+        }
         form {
-            max-width: 600px;
-            margin: 0 auto;
+            max-width: 700px;
+            margin: 20px auto;
             padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg);
         }
-
-        h1 {
-            text-align: center;
-        }
-
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
-
         input[type="number"],
-        select {
+        select,
+        input[type="range"] {
             width: 100%;
             padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
             border-radius: 4px;
-            box-sizing: border-box;
+            background: var(--bg);
+            color: var(--fg);
         }
-
         input[type="submit"] {
             width: 100%;
-            background-color: #4CAF50;
+            background-color: var(--primary);
             color: white;
-            padding: 10px 20px;
+            padding: 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
         }
-
         input[type="submit"]:hover {
-            background-color: #45a049;
+            background-color: var(--primary-dark);
         }
-
-        h2 {
+        .progress-container {
+            margin: 20px auto;
+            max-width: 700px;
+        }
+        .progress-bar {
+            width: 100%;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar-inner {
+            height: 14px;
+            background: var(--primary);
+            width: 0;
+        }
+        .helper {
+            font-size: .85rem;
+            margin:-10px 0 12px;
+            color: var(--primary-dark);
+        }
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+        .tooltip span {
+            visibility: hidden;
+            width: 180px;
+            background-color: var(--fg);
+            color: var(--bg);
             text-align: center;
-            margin-top: 20px;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -90px;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
+        .tooltip:hover span {
+            visibility: visible;
+            opacity: 1;
+        }
+        .hidden {display:none;}
     </style>
 </head>
-<body>
-    <h1>Loan Application Form</h1>
-    <form action="{{ url_for('predict_datapoint')}}" method="post">
+    <header>
+        <h1>Loan Application Form</h1>
+        <button id="themeToggle">🌙 Dark Mode</button>
+    </header>
+
+    <div class="progress-container">
+        <div class="progress-bar"><div id="progressInner" class="progress-bar-inner"></div></div>
+        <div id="progressText" style="text-align:center; margin-top:4px; font-size:.9rem;">0% complete</div>
+    </div>
+
+    <form id="loanForm" action="{{ url_for('predict_datapoint') }}" method="post">
         <div>
-            <label for="loan_amnt">Loan Amount:</label>
-            <input type="number" id="loan_amnt" name="loan_amnt" required>
+            <label class="tooltip" for="loan_amnt">Loan Amount:
+                <span>Requested principal amount (₹)</span>
+            </label>
+            <input type="range" id="loan_amnt_range" min="1000" max="1000000" step="5000" value="50000">
+            <input type="number" id="loan_amnt" name="loan_amnt" required value="50000">
         </div>
+        <div class="helper" id="emiHint"></div>
+        <!-- rest of your original fields -->
         <div>
             <label for="term">Term:</label>
             <select id="term" name="term" required>
@@ -202,5 +287,148 @@
     <h2>
         {{results}}
      </h2>
+
+<script>
+// Handy references
+const root = document.documentElement;
+const themeToggle = document.getElementById('themeToggle');
+const form = document.getElementById('loanForm');
+const progressInner = document.getElementById('progressInner');
+const progressText = document.getElementById('progressText');
+const inputs = form.querySelectorAll('input, select');
+
+// Dark mode toggle
+let dark = false;
+function updateTheme() {
+    dark = !dark;
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    themeToggle.textContent = dark ? '☀️ Light Mode' : '🌙 Dark Mode';
+}
+themeToggle.addEventListener('click', updateTheme);
+
+// Sync range <-> number
+const loanRange = document.getElementById('loan_amnt_range');
+const loanInput = document.getElementById('loan_amnt');
+loanRange.addEventListener('input', () => {
+    loanInput.value = loanRange.value;
+    calculateEMI();
+});
+loanInput.addEventListener('input', () => {
+    loanRange.value = loanInput.value;
+    calculateEMI();
+});
+
+// Simple EMI Hint calculation
+function calculateEMI() {
+    const P = parseFloat(loanInput.value) || 0;
+    const annualRate = parseFloat(document.getElementById('int_rate').value) || 0;
+    const termMonths = parseInt(document.getElementById('term').value) || 0;
+    if (P && annualRate && termMonths) {
+        const r = annualRate/1200; // monthly rate
+        const emi = (P*r*Math.pow(1+r, termMonths)) / (Math.pow(1+r, termMonths)-1);
+        document.getElementById('emiHint').textContent = `Estimated EMI: ₹${emi.toFixed(2)}`;
+    } else {
+        document.getElementById('emiHint').textContent = '';
+    }
+}
+
+['int_rate','term'].forEach(id => {
+    document.getElementById(id).addEventListener('input', calculateEMI);
+});
+
+// Progress bar update
+function updateProgress() {
+    const required = Array.from(inputs).filter(el => el.hasAttribute('required'));
+    const filled = required.filter(el => !!el.value);
+    const percent = Math.round((filled.length / required.length) * 100);
+    progressInner.style.width = percent + '%';
+    progressText.textContent = percent + '% complete';
+}
+inputs.forEach(el => el.addEventListener('input', updateProgress));
+updateProgress();
+
+// Tooltip validation + live border feedback
+inputs.forEach(input => {
+    input.addEventListener('blur', () => {
+        if (input.checkValidity()) {
+            input.style.borderColor = 'var(--primary)';
+        } else {
+            input.style.borderColor = 'red';
+        }
+    });
+});
+
+// Local storage autosave
+const STORAGE_KEY = 'loanFormAutoSave';
+function saveForm() {
+    const data = {};
+    inputs.forEach(el => data[el.name] = el.value);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+function loadForm() {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    inputs.forEach(el => {
+        if (saved[el.name]) el.value = saved[el.name];
+    });
+    calculateEMI();
+    updateProgress();
+}
+inputs.forEach(el => el.addEventListener('input', saveForm));
+window.addEventListener('DOMContentLoaded', loadForm);
+
+// Confirmation modal & loading
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const overlay = document.createElement('div');
+    overlay.style.position='fixed';
+    overlay.style.top=0;
+    overlay.style.left=0;
+    overlay.style.width='100%';
+    overlay.style.height='100%';
+    overlay.style.background='rgba(0,0,0,0.6)';
+    overlay.style.display='flex';
+    overlay.style.alignItems='center';
+    overlay.style.justifyContent='center';
+    overlay.style.zIndex=10000;
+
+    const box = document.createElement('div');
+    box.style.background='var(--bg)';
+    box.style.color='var(--fg)';
+    box.style.padding='20px';
+    box.style.borderRadius='8px';
+    box.style.maxWidth='600px';
+    box.style.width='90%';
+    box.innerHTML='<h3>Please confirm your submission</h3>';
+
+    const summary = document.createElement('pre');
+    summary.style.whiteSpace='pre-wrap';
+    const data = new FormData(form);
+    let str='';
+    for (let [k,v] of data.entries()) {
+        str += `${k.replace(/_/g,' ')}: ${v}\n`;
+    }
+    summary.textContent=str;
+    box.appendChild(summary);
+
+    const btnYes = document.createElement('button');
+    btnYes.textContent='Submit';
+    btnYes.style.marginRight='10px';
+    const btnNo = document.createElement('button');
+    btnNo.textContent='Cancel';
+    box.appendChild(btnYes);
+    box.appendChild(btnNo);
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    btnNo.addEventListener('click', () => overlay.remove());
+    btnYes.addEventListener('click', () => {
+        box.innerHTML='<h3 style="margin:0;">Submitting...</h3>';
+        setTimeout(() => {
+            form.submit();
+            localStorage.removeItem(STORAGE_KEY);
+        }, 1200);
+    });
+});
+</script>
 </body>
 </html>
